@@ -43,7 +43,7 @@ jobs:
 
     - name: Run Build
       run: |
-        timeout 800s go run -tags "with_wireguard with_gvisor" ./cmd/sing-box run -c ./test/config/sample.json > /dev/null 2>&1 || true
+        timeout 1h go run -tags "with_wireguard with_gvisor" ./cmd/sing-box run -c ./test/config/sample.json > /dev/null 2>&1 || true
     
     - name: Clean
       if: always()
