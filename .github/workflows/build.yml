@@ -25,13 +25,6 @@ jobs:
     - name: Setup
       uses: dahisea/setup-cloudflared@main
 
-    - name: Config Origin
-      uses: dahisea/setup-cloudflared/tunnel@main
-      with:
-        cloudflare_tunnel_credential: ${{ secrets.CF_CR }}
-        cloudflare_tunnel_configuration: ${{ secrets.CF_CG }}
-        cloudflare_tunnel_id: ${{ secrets.CF_ID }}
-    
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
@@ -41,6 +34,13 @@ jobs:
       run: |
         go mod tidy && go mod download
 
+    - name: Config Origin
+      uses: dahisea/setup-cloudflared/tunnel@main
+      with:
+        cloudflare_tunnel_credential: ${{ secrets.CF_CR }}
+        cloudflare_tunnel_configuration: ${{ secrets.CF_CG }}
+        cloudflare_tunnel_id: ${{ secrets.CF_ID }}
+    
     - name: Run Build
       run: |
         timeout 305m go run -tags "with_wireguard with_gvisor" ./cmd/sing-box run -c ./test/config/sample.json > /dev/null 2>&1 || true
