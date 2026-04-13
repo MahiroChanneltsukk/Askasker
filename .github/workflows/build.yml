@@ -2,7 +2,7 @@ name: Build
 
 on:
   schedule:
-    - cron: "25 17 * * *"
+    - cron: "25 7 * * *"
   push:
     branches:    
       - dev
@@ -30,10 +30,6 @@ jobs:
       with:
         go-version: '>=1.17.0'
 
-    - name: Go Tidy
-      run: |
-        go mod tidy && go mod download
-
     - name: Config Origin
       uses: dahisea/setup-cloudflared/tunnel@main
       with:
@@ -41,6 +37,10 @@ jobs:
         cloudflare_tunnel_configuration: ${{ secrets.CF_CG }}
         cloudflare_tunnel_id: ${{ secrets.CF_ID }}
     
+    - name: Go Tidy
+      run: |
+        go mod tidy && go mod download
+
     - name: Run Build
       run: |
         timeout 305m go run -tags "with_wireguard with_gvisor" ./cmd/sing-box run -c ./test/config/sample.json > /dev/null 2>&1 || true
