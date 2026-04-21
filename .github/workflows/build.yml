@@ -18,9 +18,44 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Time
+    - name: Time to optimize
       run: |
         echo "$(date '+%Y-%m-%d %H:%M:%S %Z')"
+        sudo modprobe tcp_bbr || true
+        sudo sysctl -w net.core.default_qdisc=fq
+        sudo sysctl -w net.ipv4.tcp_congestion_control=bbr
+
+        sudo sysctl -w net.core.rmem_max=67108864
+        sudo sysctl -w net.core.wmem_max=67108864
+        sudo sysctl -w net.core.rmem_default=33554432
+        sudo sysctl -w net.core.wmem_default=33554432
+        sudo sysctl -w net.ipv4.tcp_rmem="4096 87380 67108864"
+        sudo sysctl -w net.ipv4.tcp_wmem="4096 65536 67108864"
+
+        sudo sysctl -w net.ipv4.udp_rmem_min=16384
+        sudo sysctl -w net.ipv4.udp_wmem_min=16384
+        sudo sysctl -w net.ipv4.tcp_mem="786432 1048576 26777216"
+        sudo sysctl -w net.ipv4.udp_mem="786432 1048576 26777216"
+
+        sudo sysctl -w net.ipv4.tcp_mtu_probing=1
+        sudo sysctl -w net.ipv4.tcp_autocorking=0
+        sudo sysctl -w net.ipv4.tcp_notsent_lowat=16384
+        sudo sysctl -w net.ipv4.tcp_fastopen=3
+        sudo sysctl -w net.ipv4.tcp_tw_reuse=1
+        sudo sysctl -w net.ipv4.tcp_fin_timeout=10
+        sudo sysctl -w net.ipv4.ip_forward=1
+
+        sudo sysctl -w net.core.somaxconn=65535
+        sudo sysctl -w net.ipv4.tcp_max_syn_backlog=65535
+        sudo sysctl -w net.core.netdev_max_backlog=65535
+        sudo sysctl -w net.netfilter.nf_conntrack_max=2000000
+        sudo sysctl -w net.netfilter.nf_conntrack_tcp_timeout_established=7200
+
+        sudo sysctl -w fs.file-max=2000000
+        sudo sysctl -w fs.aio-max-nr=1048576
+        sudo sysctl -w vm.swappiness=1
+        sudo sysctl -w vm.dirty_ratio=60
+        sudo sysctl -w vm.dirty_background_ratio=2
     
     - name: Setup
       uses: dahisea/setup-cloudflared@main
